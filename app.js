@@ -49,9 +49,11 @@ const ui = {
   gameControls: document.getElementById("game-controls"),
   newGame: document.getElementById("new-game"),
   currentLink: document.getElementById("current-link"),
+  copyLink: document.getElementById("copy-link"),
   gameCard: document.getElementById("game-card"),
   gameTitle: document.getElementById("game-title"),
   status: document.getElementById("status"),
+  turnChip: document.getElementById("turn-chip"),
   board: document.getElementById("board"),
   message: document.getElementById("message"),
   joinGame: document.getElementById("join-game"),
@@ -77,7 +79,7 @@ let authInitAttempted = false;
 
 function notify(message, isError = false) {
   ui.message.textContent = message;
-  ui.message.style.color = isError ? "#f87171" : "#86efac";
+  ui.message.classList.toggle("error", isError);
 }
 
 function readHashGameId() {
@@ -161,6 +163,7 @@ function renderGame() {
   if (!gameState || !currentGameId) {
     ui.gameTitle.textContent = "No game selected";
     ui.status.textContent = "Create a new game or open /#game/[game-id].";
+    ui.turnChip.textContent = "Spectating";
     ui.joinGame.classList.add("hidden");
     ui.resetGame.classList.add("hidden");
     renderBoard();
@@ -177,12 +180,16 @@ function renderGame() {
 
   if (gameState.status === "won") {
     ui.status.textContent = `Winner: ${gameState.winner}. You are ${mine || "spectator"}.`;
+    ui.turnChip.textContent = "Game over";
   } else if (gameState.status === "draw") {
     ui.status.textContent = `Draw game. You are ${mine || "spectator"}.`;
+    ui.turnChip.textContent = "Draw";
   } else if (gameState.status === "waiting") {
     ui.status.textContent = `Waiting for players (X: ${xPlayer}, O: ${oPlayer}). You are ${mine || "spectator"}.`;
+    ui.turnChip.textContent = "Waiting";
   } else {
     ui.status.textContent = `Turn: ${gameState.turn}. You are ${mine || "spectator"}.`;
+    ui.turnChip.textContent = `Turn ${gameState.turn}`;
   }
 
   const hasOpenSeat = !gameState.players?.X || !gameState.players?.O;
@@ -240,6 +247,21 @@ async function createGame() {
   await setDoc(gameRef, newEmptyGame(currentUser.uid));
   setHashGameId(gameRef.id);
   notify("New game created.");
+}
+
+async function copyCurrentLink() {
+  if (!currentGameId) {
+    notify("Create or open a game before copying a link.", true);
+    return;
+  }
+
+  const link = `${window.location.origin}${window.location.pathname}#game/${currentGameId}`;
+  try {
+    await navigator.clipboard.writeText(link);
+    notify("Game link copied to clipboard.");
+  } catch (error) {
+    notify("Copy failed. You can still copy it manually from the link text.", true);
+  }
 }
 
 async function makeMove(index) {
@@ -338,6 +360,7 @@ ui.emailSignup.addEventListener("click", () => handleEmail("signup"));
 ui.emailLogin.addEventListener("click", () => handleEmail("login"));
 ui.logout.addEventListener("click", () => signOut(auth));
 ui.newGame.addEventListener("click", createGame);
+ui.copyLink.addEventListener("click", copyCurrentLink);
 ui.joinGame.addEventListener("click", joinGame);
 ui.resetGame.addEventListener("click", async () => {
   try {
@@ -383,6 +406,7 @@ onAuthStateChanged(auth, async (user) => {
     ui.logout.classList.add("hidden");
     ui.gameControls.classList.add("hidden");
     ui.currentLink.textContent = "";
+    ui.turnChip.textContent = "Spectating";
 
     renderGame();
   }
