@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isPlayer(data) {
+      return data.players.X == request.auth.uid || data.players.O == request.auth.uid;
+    }
+
+    function hasValidBoard(data) {
+      return data.board is list && data.board.size() == 9;
+    }
+
+    match /games/{gameId} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.turn == 'X'
+        && request.resource.data.status == 'waiting'
+        && request.resource.data.winner == null
+        && hasValidBoard(request.resource.data);
+
+      allow update: if isSignedIn()
+        && isPlayer(resource.data)
+        && request.resource.data.players == resource.data.players
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && hasValidBoard(request.resource.data)
+        && request.resource.data.turn in ['X', 'O']
+        && request.resource.data.status in ['waiting', 'active', 'won', 'draw'];
+
+      allow delete: if false;
+    }
+  }
+}
