@@ -79,13 +79,23 @@ function notify(message, isError = false) {
 }
 
 function readHashGameId() {
-  const hash = window.location.hash || "";
-  const match = hash.match(/^#game\/([A-Za-z0-9_-]+)$/);
-  return match ? match[1] : null;
+  const rawHash = window.location.hash || "";
+  const normalized = rawHash.replace(/^#\/?/, "");
+  if (!normalized) return null;
+
+  const [route, ...rest] = normalized.split("/");
+  if (route !== "game") return null;
+
+  const rawId = rest.join("/").trim();
+  if (!rawId) return null;
+
+  const noBrackets = rawId.replace(/^\[/, "").replace(/\]$/, "");
+  const decoded = decodeURIComponent(noBrackets);
+  return decoded || null;
 }
 
 function setHashGameId(gameId) {
-  window.location.hash = `game/${gameId}`;
+  window.location.hash = `#game/${gameId}`;
 }
 
 function newEmptyGame(uid) {
