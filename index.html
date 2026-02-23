@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase TicTacToe</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Firebase TicTacToe</h1>
+
+      <section class="card" id="auth-card">
+        <h2>Login</h2>
+        <div class="auth-buttons">
+          <button id="google-login">Sign in with Google</button>
+          <button id="anon-login">Continue as Guest</button>
+        </div>
+
+        <form id="email-form" class="email-form">
+          <input id="email" type="email" placeholder="Email" required />
+          <input id="password" type="password" placeholder="Password" minlength="6" required />
+          <div class="auth-buttons">
+            <button type="button" id="email-signup">Create account</button>
+            <button type="button" id="email-login">Login</button>
+          </div>
+        </form>
+
+        <div id="user-info" class="user-info hidden"></div>
+        <button id="logout" class="hidden">Logout</button>
+      </section>
+
+      <section class="card hidden" id="game-controls">
+        <h2>Games</h2>
+        <button id="new-game">Create New Game Link</button>
+        <p id="current-link" class="muted"></p>
+      </section>
+
+      <section class="card hidden" id="game-card">
+        <h2 id="game-title">No game selected</h2>
+        <p id="status" class="status"></p>
+        <div id="board" class="board"></div>
+        <div class="game-actions">
+          <button id="join-game" class="hidden">Join game</button>
+          <button id="reset-game" class="hidden">Reset this game</button>
+        </div>
+      </section>
+
+      <p id="message"></p>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
