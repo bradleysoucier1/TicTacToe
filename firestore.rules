@@ -14,10 +14,18 @@ service cloud.firestore {
     }
 
     function isSeatClaimUpdate() {
-      return resource.data.players.X != null
-        && request.resource.data.players.X == resource.data.players.X
-        && resource.data.players.O == null
-        && request.resource.data.players.O == request.auth.uid
+      return (
+        (
+          resource.data.players.X == null
+          && request.resource.data.players.X == request.auth.uid
+          && request.resource.data.players.O == resource.data.players.O
+        )
+        || (
+          resource.data.players.O == null
+          && request.resource.data.players.O == request.auth.uid
+          && request.resource.data.players.X == resource.data.players.X
+        )
+      )
         && request.resource.data.board == resource.data.board
         && request.resource.data.turn == resource.data.turn
         && request.resource.data.winner == resource.data.winner
