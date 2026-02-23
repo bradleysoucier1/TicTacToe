@@ -54,6 +54,7 @@ const ui = {
   status: document.getElementById("status"),
   board: document.getElementById("board"),
   message: document.getElementById("message"),
+  joinGame: document.getElementById("join-game"),
   resetGame: document.getElementById("reset-game"),
 };
 
@@ -160,6 +161,7 @@ function renderGame() {
   if (!gameState || !currentGameId) {
     ui.gameTitle.textContent = "No game selected";
     ui.status.textContent = "Create a new game or open /#game/[game-id].";
+    ui.joinGame.classList.add("hidden");
     ui.resetGame.classList.add("hidden");
     renderBoard();
     return;
@@ -183,6 +185,8 @@ function renderGame() {
     ui.status.textContent = `Turn: ${gameState.turn}. You are ${mine || "spectator"}.`;
   }
 
+  const hasOpenSeat = !gameState.players?.X || !gameState.players?.O;
+  ui.joinGame.classList.toggle("hidden", !!mine || !hasOpenSeat);
   ui.resetGame.classList.toggle("hidden", !mine);
   renderBoard();
 }
@@ -207,12 +211,6 @@ async function openGame(gameId) {
     return;
   }
 
-  try {
-    await claimSeat(gameId);
-  } catch (error) {
-    notify("Joined as spectator for now. Waiting for an open player seat.");
-  }
-
   unsubscribeGame = onSnapshot(gameRef, async (docSnap) => {
     if (!docSnap.exists()) {
       notify("Game deleted.", true);
@@ -223,14 +221,17 @@ async function openGame(gameId) {
     gameState = docSnap.data();
     renderGame();
 
-    if (currentUser) {
-      try {
-        await claimSeat(gameId);
-      } catch {
-        // Ignore seat race conflicts.
-      }
-    }
   });
+}
+
+async function joinGame() {
+  if (!currentGameId || !currentUser) return;
+  try {
+    await claimSeat(currentGameId);
+    notify("Joined game as a player.");
+  } catch (error) {
+    notify(error.message || "Could not join game.", true);
+  }
 }
 
 async function createGame() {
@@ -337,6 +338,7 @@ ui.emailSignup.addEventListener("click", () => handleEmail("signup"));
 ui.emailLogin.addEventListener("click", () => handleEmail("login"));
 ui.logout.addEventListener("click", () => signOut(auth));
 ui.newGame.addEventListener("click", createGame);
+ui.joinGame.addEventListener("click", joinGame);
 ui.resetGame.addEventListener("click", async () => {
   try {
     await resetGame();

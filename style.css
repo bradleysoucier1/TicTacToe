@@ -67,6 +67,13 @@ button:hover {
   justify-content: start;
 }
 
+.game-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .cell {
   width: 100px;
   height: 100px;
