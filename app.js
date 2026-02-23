@@ -72,6 +72,7 @@ let currentUser = null;
 let currentGameId = null;
 let unsubscribeGame = null;
 let gameState = null;
+let authInitAttempted = false;
 
 function notify(message, isError = false) {
   ui.message.textContent = message;
@@ -79,23 +80,13 @@ function notify(message, isError = false) {
 }
 
 function readHashGameId() {
-  const rawHash = window.location.hash || "";
-  const normalized = rawHash.replace(/^#\/?/, "");
-  if (!normalized) return null;
-
-  const [route, ...rest] = normalized.split("/");
-  if (route !== "game") return null;
-
-  const rawId = rest.join("/").trim();
-  if (!rawId) return null;
-
-  const noBrackets = rawId.replace(/^\[/, "").replace(/\]$/, "");
-  const decoded = decodeURIComponent(noBrackets);
-  return decoded || null;
+  const hash = window.location.hash || "";
+  const match = hash.match(/^#game\/([A-Za-z0-9_-]+)$/);
+  return match ? match[1] : null;
 }
 
 function setHashGameId(gameId) {
-  window.location.hash = `#game/${gameId}`;
+  window.location.hash = `game/${gameId}`;
 }
 
 function newEmptyGame(uid) {
@@ -367,6 +358,16 @@ onAuthStateChanged(auth, async (user) => {
     if (hashGameId) await openGame(hashGameId);
     else renderGame();
   } else {
+    if (!authInitAttempted) {
+      authInitAttempted = true;
+      try {
+        await signInAnonymously(auth);
+        return;
+      } catch (error) {
+        notify(error.message || "Automatic anonymous sign-in failed.", true);
+      }
+    }
+
     if (unsubscribeGame) unsubscribeGame();
     unsubscribeGame = null;
     gameState = null;
