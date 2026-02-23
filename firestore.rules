@@ -13,6 +13,19 @@ service cloud.firestore {
       return data.board is list && data.board.size() == 9;
     }
 
+    function isSeatClaimUpdate() {
+      return resource.data.players.X != null
+        && request.resource.data.players.X == resource.data.players.X
+        && resource.data.players.O == null
+        && request.resource.data.players.O == request.auth.uid
+        && request.resource.data.board == resource.data.board
+        && request.resource.data.turn == resource.data.turn
+        && request.resource.data.winner == resource.data.winner
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.status in ['waiting', 'active'];
+    }
+
     match /games/{gameId} {
       allow read: if isSignedIn();
 
@@ -24,13 +37,15 @@ service cloud.firestore {
         && hasValidBoard(request.resource.data);
 
       allow update: if isSignedIn()
-        && isPlayer(resource.data)
-        && request.resource.data.players == resource.data.players
-        && request.resource.data.createdBy == resource.data.createdBy
-        && request.resource.data.createdAt == resource.data.createdAt
         && hasValidBoard(request.resource.data)
         && request.resource.data.turn in ['X', 'O']
-        && request.resource.data.status in ['waiting', 'active', 'won', 'draw'];
+        && request.resource.data.status in ['waiting', 'active', 'won', 'draw']
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (
+          (isPlayer(resource.data) && request.resource.data.players == resource.data.players)
+          || isSeatClaimUpdate()
+        );
 
       allow delete: if false;
     }

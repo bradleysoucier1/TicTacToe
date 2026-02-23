@@ -207,7 +207,11 @@ async function openGame(gameId) {
     return;
   }
 
-  await claimSeat(gameId);
+  try {
+    await claimSeat(gameId);
+  } catch (error) {
+    notify("Joined as spectator for now. Waiting for an open player seat.");
+  }
 
   unsubscribeGame = onSnapshot(gameRef, async (docSnap) => {
     if (!docSnap.exists()) {
