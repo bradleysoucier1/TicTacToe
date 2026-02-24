@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase TicTacToe</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar card">
+        <div>
+          <p class="eyebrow">Realtime multiplayer</p>
+          <h1>Firebase TicTacToe</h1>
+          <p class="subhead">Share a link, watch as spectator, then tap Join when you're ready to play.</p>
+        </div>
+        <div id="user-info" class="user-chip hidden"></div>
+      </header>
+
+      <section class="card" id="auth-card">
+        <h2>Sign in</h2>
+        <p class="support-text">Choose any method below. Anonymous sign-in is great for quick testing.</p>
+
+        <div class="button-row">
+          <button id="google-login" class="btn filled">Continue with Google</button>
+          <button id="anon-login" class="btn tonal">Continue as Guest</button>
+          <button id="logout" class="btn text hidden">Logout</button>
+        </div>
+
+        <form id="email-form" class="email-form" autocomplete="on">
+          <label class="field">
+            <span>Email</span>
+            <input id="email" type="email" placeholder="you@example.com" required />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="password" type="password" placeholder="At least 6 characters" minlength="6" required />
+          </label>
+          <div class="button-row">
+            <button type="button" id="email-signup" class="btn outlined">Create account</button>
+            <button type="button" id="email-login" class="btn filled">Login</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card hidden" id="game-controls">
+        <h2>Games</h2>
+        <p class="support-text">Create a game, then share the link with a friend.</p>
+        <div class="button-row">
+          <button id="new-game" class="btn filled">Create new game link</button>
+          <button id="copy-link" class="btn outlined">Copy link</button>
+        </div>
+        <p id="current-link" class="muted"></p>
+      </section>
+
+      <section class="card hidden" id="game-card">
+        <div class="game-header-row">
+          <h2 id="game-title">No game selected</h2>
+          <span id="turn-chip" class="status-chip">Spectating</span>
+        </div>
+
+        <p id="status" class="status"></p>
+        <div id="board" class="board"></div>
+
+        <div class="game-actions">
+          <button id="join-game" class="btn filled hidden">Join game</button>
+          <button id="reset-game" class="btn outlined hidden">Reset this game</button>
+        </div>
+      </section>
+
+      <p id="message" class="message"></p>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
