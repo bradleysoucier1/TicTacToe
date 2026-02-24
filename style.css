@@ -90,6 +90,10 @@ h2 {
   flex-wrap: wrap;
 }
 
+.game-actions {
+  margin-top: 0.95rem;
+}
+
 .button-row {
   margin-top: 0.8rem;
 }
@@ -159,6 +163,7 @@ input {
   display: grid;
   grid-template-columns: repeat(3, minmax(84px, 104px));
   gap: 0.55rem;
+  width: fit-content;
 }
 
 .cell {
@@ -202,7 +207,10 @@ input {
     border-radius: 20px;
   }
 
-  .board,
+  .board {
+    grid-template-columns: repeat(3, 90px);
+  }
+
   .cell {
     width: 90px;
     height: 90px;
